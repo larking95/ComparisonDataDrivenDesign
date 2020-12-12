@@ -2,7 +2,7 @@
 """
 Created on Thu Mar  5 03:50:23 2020
 
-@author: larking95
+@author: syotaro
 """
 
 import matplotlib.pyplot as plt
@@ -43,7 +43,7 @@ callbackFunc.ax1 = callbackFunc.fig1.add_subplot(1, 1, 1)
 # === 設計仕様の決定 ===
 # サンプリングタイムと演算子
 Ts = 0.001
-s = ctl.tf([1,0], [1])        # ラプラス演算子 s
+s = ctl.tf([1,0], [1])         # ラプラス演算子 s
 z = ctl.tf([1, 0], [1], Ts)    # 時間進み演算子 z
 
 # 参照モデル Td
@@ -60,9 +60,9 @@ rho0 = np.array([10, 0.0, 0.0])              # 適当な比例制御器（安定
 C0 = Crho(rho0)
 
 # === 入出力データの取得 ===
-# データ取得に用いる入力信号 u  (ステップ信号)
-N = 1000           # データ数
-r0 = np.ones(N)  # 信号のベクトル
+# データ取得に用いる入力信号 r (ステップ信号)
+N  = 1000           # データ数
+r0 = np.ones(N)     # 信号のベクトル
 
 # 制御対象モデル P
 Tp = 0.74
@@ -99,11 +99,12 @@ optResult = minimize(f, rho0,
                      callback=callbackFunc
                      )
 rho = optResult["x"]
-print("初期の評価値\t： {:5.3f}".format(f(rho0)))
-print("設計後の評価値\t： {:5.3f}".format(f(rho)))
-
 # 設計した制御器 C
 C = Crho(rho)  # 制御器を求める
+
+# 評価値
+print("初期の評価値\t： {:5.3f}".format(f(rho0)))
+print("設計後の評価値\t： {:5.3f}".format(f(rho)))
 
 # === 性能の確認 ===
 # 制御器を実装したシステム全体 G
@@ -116,7 +117,7 @@ timeRange = np.arange(0, 0.12 + Ts, Ts)
 ym, _ = ctl.step(Td, timeRange)
 yg, _ = ctl.step(G, timeRange)
 plt.plot(timeRange, ym, timeRange, yg)
-plt.xlabel("Time [s]", usetex=True)
+plt.xlabel("Time [s]")
 plt.ylabel("Velocity [V]")
 plt.legend(['Reference model', 'Closed loop system'], loc='lower right')
 
